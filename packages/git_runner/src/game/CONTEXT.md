@@ -1,4 +1,4 @@
-# Directory Context: `/packages/experiments/parallax_dino_runner/src/game`
+# Directory Context: `/packages/git_runner/src/game`
 
 ## Purpose
 The rules of the game, with no drawing, no keyboard, and no clock. The page gives the commands of the player to `GameWorld` and calls its step again and again.

@@ -1,0 +1,13 @@
+{
+  "name": "game_git_runner",
+  "private": true,
+  "license": "MIT",
+  "packageManager": "pnpm@10.33.2",
+  "scripts": {
+    "dev": "pnpm --filter git_runner dev",
+    "build": "pnpm --filter git_runner build",
+    "commits": "pnpm --filter git_runner commits:build",
+    "test": "pnpm --filter git_runner test",
+    "typecheck": "pnpm --filter git_runner exec tsc --noEmit"
+  }
+}

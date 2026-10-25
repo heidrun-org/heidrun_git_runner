@@ -1,6 +1,6 @@
 import { defineConfig } from 'vitest/config';
 
-// The page of the experiment is index.html. The base "./" makes every address of the build relative, so the folder
+// The page of the game is index.html. The base "./" makes every address of the build relative, so the folder
 // of the build works in any place of a server of static files. The page reads the file commits.json next to it.
 export default defineConfig({
 	base: './',

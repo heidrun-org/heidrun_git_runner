@@ -1,4 +1,4 @@
-# Directory Context: `/packages/experiments/parallax_dino_runner/src/view`
+# Directory Context: `/packages/git_runner/src/view`
 
 ## Purpose
 The page of the game: the canvas, the keyboard, the game loop, and the drawing of every picture. It reads the state of `src/game/` and never changes it.

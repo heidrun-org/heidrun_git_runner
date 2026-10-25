@@ -112,7 +112,7 @@ export class HudPainter {
 		let lines: string[];
 		if (gameState.phase === 'ready') {
 			lines = [
-				'PARALLAX DINO RUNNER',
+				'GIT RUNNER',
 				'Press Enter to start',
 				'Space: jump     F: shoot',
 				'Arrow up, arrow down: change lane',

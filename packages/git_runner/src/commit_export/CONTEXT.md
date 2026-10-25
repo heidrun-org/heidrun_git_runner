@@ -1,10 +1,10 @@
-# Directory Context: `/packages/experiments/parallax_dino_runner/src/commit_export`
+# Directory Context: `/packages/git_runner/src/commit_export`
 
 ## Purpose
 The script that reads the Git history of a folder and writes the file `public/commits.json`, which the page of the game reads. It runs in Node.js, never in the browser, and it needs no network.
 
 ## Key Exports & Entry Points
-- `cli.ts`: `Cli`, the command line: `pnpm experiment:parallax_dino_runner:commits`. The option `--git-folder <path>` gives the repository, and the option `--output <path>` gives the file.
+- `cli.ts`: `Cli`, the command line: `pnpm commits`. The option `--git-folder <path>` gives the repository, and the option `--output <path>` gives the file.
 - `commit_exporter.ts`: `CommitExporter`, which reads the history, gives the lanes, and writes the file with one commit on each line.
 - `git_commit_reader.ts`: `GitCommitReader`, the only code that runs the command `git`.
 - `lane_assigner.ts`: `LaneAssigner`, which puts the commits in order and gives each commit its lane. It uses no file and no command.

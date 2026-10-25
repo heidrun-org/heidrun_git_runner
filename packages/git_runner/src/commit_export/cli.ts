@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 // Writes the file public/commits.json from the Git history of a folder.
-// pnpm --filter parallax_dino_runner commits:build
+// pnpm commits
 import Path from 'node:path';
 import { Command } from 'commander';
 import { CommitExporter } from './commit_exporter.ts';
@@ -24,7 +24,7 @@ type CliOptions = {
 };
 
 /**
- * The command line of the package `parallax_dino_runner`: reads the Git history of a folder and writes the file
+ * The command line of the package `git_runner`: reads the Git history of a folder and writes the file
  * `commits.json` that the page of the game reads.
  */
 export class Cli {
@@ -39,7 +39,7 @@ export class Cli {
 	static main(argv: string[]): void {
 		const program = new Command();
 		program
-			.name('pnpm --filter parallax_dino_runner commits:build')
+			.name('pnpm commits')
 			.description(
 				'Reads the Git history of a folder, and writes the file commits.json that the page of the game reads. '
 					+ 'The command needs no network, and it never changes the Git folder.',

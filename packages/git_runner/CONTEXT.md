@@ -1,21 +1,21 @@
-# Directory Context: `/packages/experiments/parallax_dino_runner`
+# Directory Context: `/packages/git_runner`
 
 ## Purpose
-An experiment: a static web page with a game. A dinosaur like the dinosaur of Chrome Dino runs to the right in a flat world with three lanes, in front of parallax layers. The player jumps, changes lane, and shoots. The things in the lanes are the commits of a Git repository, from the oldest commit to the newest commit. The world never goes up or down: this is stage 2 of the video game, and the force graph comes later.
+The game Git Runner: a static web page. A dinosaur like the dinosaur of Chrome Dino runs to the right in a flat world with three lanes, in front of parallax layers. The player jumps, changes lane, and shoots. The things in the lanes are the commits of a Git repository, from the oldest commit to the newest commit. The world never goes up or down: this is stage 2 of the video game, and the force graph comes later.
 
 ## Key Exports & Entry Points
-- `src/index.ts`: the public interface for another package of `packages/experiments`. It exports `GameWorld`, `GameSettings`, the rules classes, the commit types, and the types of the folder `src/game`.
+- `src/index.ts`: the public interface for another package. It exports `GameWorld`, `GameSettings`, the rules classes, the commit types, and the types of the folder `src/game`.
 - `src/game/`: the rules of the game, with no browser code — see its own CONTEXT.md.
 - `src/view/`: the page: the drawing, the keyboard, and the game loop — see its own CONTEXT.md.
 - `src/commit_export/`: the script that reads the Git history of a folder and writes the file `public/commits.json` — see its own CONTEXT.md.
 - `index.html`: the page, which loads `src/view/game_page.ts`.
 - `README.md`: how a person makes the game for another repository and puts it on a server of static files.
 - `tests/`: the Vitest tests. `tests/test_states.ts` makes small states and small runs, and `tests/test_git_repository.ts` makes a small real Git repository. Only the tests import them.
-- Command to write the commits of this repository: `pnpm experiment:parallax_dino_runner:commits`. Add `--git-folder <path>` for another repository.
-- Command to play: `pnpm experiment:parallax_dino_runner` at the root of the repository. Add `?seed=42` to the address of the page to play the same world again.
-- Command to build the static folder `dist`: `pnpm --filter parallax_dino_runner build`
-- Command to test this folder: `pnpm --filter parallax_dino_runner test`
-- Command to check the types: `pnpm --filter parallax_dino_runner exec tsc --noEmit`
+- Command to write the commits of this repository: `pnpm commits`. Add `--git-folder <path>` for another repository.
+- Command to play: `pnpm dev` at the root of the repository. Add `?seed=42` to the address of the page to play the same world again.
+- Command to build the static folder `dist`: `pnpm --filter git_runner build`
+- Command to test this folder: `pnpm --filter git_runner test`
+- Command to check the types: `pnpm --filter git_runner exec tsc --noEmit`
 
 ## Rules
 - The page is static files only. Its one request is for the file `commits.json`, with a relative address, and every address of the build is relative (`base: './'` in `vite.config.ts`), so the folder `dist` works in any place of a server of static files. `tests/static_build.test.ts` tests this.

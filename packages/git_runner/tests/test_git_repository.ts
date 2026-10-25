@@ -22,7 +22,7 @@ export class TestGitRepository {
 	 * @returns The folder.
 	 */
 	static createTemporaryFolder(): string {
-		const folder = Fs.mkdtempSync(Path.join(Os.tmpdir(), 'parallax_dino_runner_test_'));
+		const folder = Fs.mkdtempSync(Path.join(Os.tmpdir(), 'git_runner_test_'));
 		TestGitRepository._folders.push(folder);
 		return folder;
 	}
