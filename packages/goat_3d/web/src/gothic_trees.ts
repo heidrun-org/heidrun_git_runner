@@ -1,16 +1,33 @@
 import * as Three from 'three';
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 import { MountainTerrain } from './mountain_terrain.ts';
+import { ToonStyle } from './toon_style.ts';
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-//	GothicTrees — dark, twisted trees with no leaves on the slopes of the mountain
+//	GothicTrees — dark, twisted trees with dark leaves on the slopes of the mountain
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
 /**
- * Dark, twisted trees with no leaves, on the grass of the ground around the mountain. Every tree is in one mesh,
- * so that the trees cost only one draw call. The same seed always gives the same trees at the same places.
+ * The geometries of every tree, before they are merged into one mesh for the wood and one mesh for the leaves.
+ */
+type TreeGeometries = {
+	/**
+	 * The geometry of each branch, from the trunks to the thinnest branches.
+	 */
+	branches: Three.BufferGeometry[];
+
+	/**
+	 * The geometry of each bunch of leaves, at the end of the thinnest branches.
+	 */
+	leaves: Three.BufferGeometry[];
+};
+
+/**
+ * Dark, twisted trees with bunches of dark leaves, on the grass of the ground around the mountain. The wood of
+ * every tree is in one mesh, and the leaves of every tree are in one other mesh, so that the trees cost only two
+ * draw calls. The same seed always gives the same trees at the same places.
  */
 export class GothicTrees {
 	/**
@@ -45,13 +62,31 @@ export class GothicTrees {
 	static readonly START_CLEARANCE = 4;
 
 	/**
-	 * Makes the mesh that holds every tree.
-	 * @param goatStart the start point of the goat, which stays free of trees.
-	 * @returns the mesh of the trees.
+	 * The colors of the bunches of leaves: mostly dark greens, and sometimes a dark red.
 	 */
-	static create(goatStart: Three.Vector3): Three.Mesh {
+	static readonly LEAF_COLORS = [0x2f4a2a, 0x3b5a2e, 0x24391f, 0x34472b];
+
+	/**
+	 * The dark red of a few bunches of leaves.
+	 */
+	static readonly RED_LEAF_COLOR = 0x6b1f1f;
+
+	/**
+	 * The chance that a bunch of leaves is dark red, from 0 to 1.
+	 */
+	static readonly RED_LEAF_CHANCE = 0.12;
+
+	/**
+	 * Makes the group that holds every tree.
+	 * @param goatStart the start point of the goat, which stays free of trees.
+	 * @returns the group that holds the mesh of the wood and the mesh of the leaves.
+	 */
+	static create(goatStart: Three.Vector3): Three.Group {
 		const randomFn = GothicTrees._createRandomFn(GothicTrees.SEED);
-		const geometries: Three.BufferGeometry[] = [];
+		const treeGeometries: TreeGeometries = {
+			branches: [],
+			leaves: [],
+		};
 		const halfSize = MountainTerrain.SIZE / 2 - 2;
 
 		let placedCount = 0;
@@ -70,22 +105,26 @@ export class GothicTrees {
 			const trunkDirection = new Three.Vector3(trunkLeanX, 1, trunkLeanZ).normalize();
 			const trunkLength = 1.6 + randomFn() * 0.9;
 			const trunkRadius = 0.12 + randomFn() * 0.06;
-			GothicTrees._addBranch(geometries, randomFn, base, trunkDirection, trunkLength, trunkRadius, 0);
+			GothicTrees._addBranch(
+				treeGeometries,
+				randomFn,
+				base,
+				trunkDirection,
+				trunkLength,
+				trunkRadius,
+				0,
+			);
 			placedCount++;
 		}
 
-		const geometry = BufferGeometryUtils.mergeGeometries(geometries);
-		for (const branchGeometry of geometries) {
-			branchGeometry.dispose();
-		}
-		const mesh = new Three.Mesh(geometry, new Three.MeshStandardMaterial({
-			color: 0x2b2522,
-			flatShading: true,
-			roughness: 1,
-		}));
-		mesh.castShadow = true;
-		mesh.receiveShadow = true;
-		return mesh;
+		const wood = GothicTrees._createMergedMesh(treeGeometries.branches, ToonStyle.createMaterial(0x2b2522));
+		const leafMaterial = ToonStyle.createMaterial(0xffffff, true);
+		const leaves = GothicTrees._createMergedMesh(treeGeometries.leaves, leafMaterial);
+
+		const group = new Three.Group();
+		group.add(wood);
+		group.add(leaves);
+		return group;
 	}
 
 	///////////////////////////////////////////////////////////////////////////////
@@ -119,8 +158,9 @@ export class GothicTrees {
 
 	/**
 	 * Adds one branch, and then the smaller branches that grow from its end. Each smaller branch turns away
-	 * from its parent and bends down a little more, which gives the twisted shape.
-	 * @param geometries the list that gets the geometry of each branch.
+	 * from its parent and bends down a little more, which gives the twisted shape. The thinnest branches end with
+	 * a bunch of leaves.
+	 * @param treeGeometries the lists that get the geometry of each branch and of each bunch of leaves.
 	 * @param randomFn the function that gives the next random number, from 0 to 1.
 	 * @param start the point where the branch starts.
 	 * @param direction the direction of the branch, as a unit vector.
@@ -129,7 +169,7 @@ export class GothicTrees {
 	 * @param depth the number of splits from the trunk to this branch. The trunk has a depth of 0.
 	 */
 	private static _addBranch(
-		geometries: Three.BufferGeometry[],
+		treeGeometries: TreeGeometries,
 		randomFn: () => number,
 		start: Three.Vector3,
 		direction: Three.Vector3,
@@ -139,8 +179,9 @@ export class GothicTrees {
 	): void {
 		const end = start.clone().addScaledVector(direction, length);
 		const endRadius = radius * 0.65;
-		geometries.push(GothicTrees._createSegmentGeometry(start, end, radius, endRadius));
+		treeGeometries.branches.push(GothicTrees._createSegmentGeometry(start, end, radius, endRadius));
 		if (depth >= GothicTrees.BRANCH_DEPTH) {
+			treeGeometries.leaves.push(GothicTrees._createLeafGeometry(randomFn, end));
 			return;
 		}
 
@@ -154,7 +195,7 @@ export class GothicTrees {
 			childDirection.normalize();
 			const childLength = length * (0.6 + randomFn() * 0.2);
 			GothicTrees._addBranch(
-				geometries,
+				treeGeometries,
 				randomFn,
 				end,
 				childDirection,
@@ -163,6 +204,55 @@ export class GothicTrees {
 				depth + 1,
 			);
 		}
+	}
+
+	/**
+	 * Makes the geometry of a bunch of leaves: a flattened low poly ball with one random color, turned at random.
+	 * @param randomFn the function that gives the next random number, from 0 to 1.
+	 * @param center the center of the bunch of leaves.
+	 * @returns the geometry, already moved to its place.
+	 */
+	private static _createLeafGeometry(randomFn: () => number, center: Three.Vector3): Three.BufferGeometry {
+		const radius = 0.22 + randomFn() * 0.16;
+		const geometry = new Three.IcosahedronGeometry(radius, 0);
+		const rotation = new Three.Quaternion().setFromEuler(new Three.Euler(
+			randomFn() * Math.PI,
+			randomFn() * Math.PI,
+			randomFn() * Math.PI,
+		));
+		const scale = new Three.Vector3(1, 0.7, 1);
+		geometry.applyMatrix4(new Three.Matrix4().compose(center, rotation, scale));
+
+		const isRed = randomFn() < GothicTrees.RED_LEAF_CHANCE;
+		const colorIndex = Math.floor(randomFn() * GothicTrees.LEAF_COLORS.length);
+		const greenColor = GothicTrees.LEAF_COLORS[colorIndex];
+		const color = new Three.Color(isRed === true ? GothicTrees.RED_LEAF_COLOR : greenColor);
+		const pointCount = geometry.getAttribute('position').count;
+		const colors = new Float32Array(pointCount * 3);
+		for (let index = 0; index < pointCount; index++) {
+			colors[index * 3] = color.r;
+			colors[index * 3 + 1] = color.g;
+			colors[index * 3 + 2] = color.b;
+		}
+		geometry.setAttribute('color', new Three.BufferAttribute(colors, 3));
+		return geometry;
+	}
+
+	/**
+	 * Merges geometries into one mesh that casts and receives shadows, and frees the geometries.
+	 * @param geometries the geometries to merge. They all have the same attributes.
+	 * @param material the material of the mesh.
+	 * @returns the mesh.
+	 */
+	private static _createMergedMesh(geometries: Three.BufferGeometry[], material: Three.Material): Three.Mesh {
+		const geometry = BufferGeometryUtils.mergeGeometries(geometries);
+		for (const partGeometry of geometries) {
+			partGeometry.dispose();
+		}
+		const mesh = new Three.Mesh(geometry, material);
+		mesh.castShadow = true;
+		mesh.receiveShadow = true;
+		return mesh;
 	}
 
 	/**

@@ -1,9 +1,12 @@
 import * as Three from 'three';
+import { OutlineEffect } from 'three/addons/effects/OutlineEffect.js';
 import { GoatJump } from './goat_jump.ts';
 import { GoatKeyboard } from './goat_keyboard.ts';
 import { GoatModel } from './goat_model.ts';
 import { GothicTrees } from './gothic_trees.ts';
 import { MountainTerrain } from './mountain_terrain.ts';
+import { ToonStyle } from './toon_style.ts';
+import { TuningPane } from './tuning_pane.ts';
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -91,6 +94,11 @@ export class GoatPage {
 		renderer.shadowMap.enabled = true;
 		renderer.shadowMap.type = Three.PCFSoftShadowMap;
 		document.body.appendChild(renderer.domElement);
+		// The outline effect draws a black outline around each object, like the Three.js example
+		// webgl_materials_toon.
+		const outlineEffect = new OutlineEffect(renderer, {
+			defaultThickness: ToonStyle.OUTLINE_THICKNESS,
+		});
 
 		scene.add(MountainTerrain.create());
 
@@ -104,7 +112,8 @@ export class GoatPage {
 		const goatKeyboard = new GoatKeyboard();
 		const goatJump = new GoatJump();
 
-		scene.add(new Three.HemisphereLight(0xcfe3ff, 0x5a6b3a, 1.2));
+		const hemisphereLight = new Three.HemisphereLight(0xcfe3ff, 0x5a6b3a, 0.8);
+		scene.add(hemisphereLight);
 		const directionalLight = new Three.DirectionalLight(0xfff4e0, 2);
 		directionalLight.castShadow = true;
 		directionalLight.shadow.mapSize.set(2048, 2048);
@@ -114,6 +123,12 @@ export class GoatPage {
 		directionalLight.shadow.camera.bottom = -3;
 		scene.add(directionalLight);
 		scene.add(directionalLight.target);
+
+		TuningPane.create({
+			outlineEffect: outlineEffect,
+			hemisphereLight: hemisphereLight,
+			directionalLight: directionalLight,
+		});
 
 		window.addEventListener('resize', () => {
 			camera.aspect = window.innerWidth / window.innerHeight;
@@ -209,7 +224,7 @@ export class GoatPage {
 			directionalLight.position.copy(groundPosition).add(GoatPage.LIGHT_OFFSET);
 			directionalLight.target.position.copy(groundPosition);
 
-			renderer.render(scene, camera);
+			outlineEffect.render(scene, camera);
 		});
 	}
 }

@@ -1,4 +1,5 @@
 import * as Three from 'three';
+import { ToonStyle } from './toon_style.ts';
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -132,11 +133,9 @@ export class MountainTerrain {
 		}
 		geometry.setAttribute('color', new Three.BufferAttribute(colors, 3));
 
-		const ground = new Three.Mesh(geometry, new Three.MeshStandardMaterial({
-			vertexColors: true,
-			flatShading: true,
-			roughness: 0.95,
-		}));
+		const groundMaterial = ToonStyle.createMaterial(0xffffff, true);
+		ToonStyle.hideOutline(groundMaterial);
+		const ground = new Three.Mesh(geometry, groundMaterial);
 		ground.receiveShadow = true;
 		return ground;
 	}
@@ -151,10 +150,7 @@ export class MountainTerrain {
 
 		const pole = new Three.Mesh(
 			new Three.CylinderGeometry(0.04, 0.04, 1.6, 6),
-			new Three.MeshStandardMaterial({
-				color: 0x6b5a45,
-				flatShading: true,
-			}),
+			ToonStyle.createMaterial(0x6b5a45),
 		);
 		pole.position.y = 0.8;
 		pole.castShadow = true;
@@ -162,10 +158,7 @@ export class MountainTerrain {
 
 		const cloth = new Three.Mesh(
 			new Three.BoxGeometry(0.6, 0.38, 0.02),
-			new Three.MeshStandardMaterial({
-				color: 0xd8432f,
-				flatShading: true,
-			}),
+			ToonStyle.createMaterial(0xd8432f),
 		);
 		cloth.position.set(0.3, 1.38, 0);
 		cloth.castShadow = true;

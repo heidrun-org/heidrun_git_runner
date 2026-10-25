@@ -1,5 +1,6 @@
 import * as Three from 'three';
 import type { GoatPose } from './goat_jump.ts';
+import { ToonStyle } from './toon_style.ts';
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -268,16 +269,12 @@ export class GoatModel {
 	///////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Makes a material with flat shading, so that every face of a shape shows as one flat color.
+	 * Makes a cartoon material.
 	 * @param color the color of the material.
 	 * @returns the material.
 	 */
-	private static _material(color: number): Three.MeshStandardMaterial {
-		return new Three.MeshStandardMaterial({
-			color: color,
-			flatShading: true,
-			roughness: 0.85,
-		});
+	private static _material(color: number): Three.MeshToonMaterial {
+		return ToonStyle.createMaterial(color);
 	}
 
 	/**
