@@ -9,8 +9,8 @@ The game is static files only. It needs no server code and no network. You can m
 You need Node.js, pnpm, and Git.
 
 ```bash
-git clone https://github.com/heidrun-org/game_git_runner.git
-cd game_git_runner
+git clone https://github.com/heidrun-org/heidrun_git_runner.git
+cd heidrun_git_runner
 pnpm install
 ```
 
