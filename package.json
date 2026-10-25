@@ -4,11 +4,11 @@
   "license": "MIT",
   "packageManager": "pnpm@10.33.2",
   "scripts": {
-    "dev": "pnpm --filter git_runner dev",
-    "build": "pnpm --filter git_runner build",
+    "dev": "pnpm --filter website dev",
+    "build": "pnpm --filter website build",
     "commits": "pnpm --filter git_runner commits:build",
     "test": "pnpm --filter git_runner test",
-    "typecheck": "pnpm --filter git_runner exec tsc --noEmit",
-    "deploy:ghpages": "pnpm --filter git_runner deploy:ghpages"
+    "typecheck": "pnpm --filter git_runner exec tsc --noEmit && pnpm --filter goat_3d typecheck && pnpm --filter website typecheck",
+    "deploy:ghpages": "pnpm --filter website deploy:ghpages"
   }
 }

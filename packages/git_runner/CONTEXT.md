@@ -12,9 +12,8 @@ The game Git Runner: a static web page. A dinosaur like the dinosaur of Chrome D
 - `README.md`: how a person makes the game for another repository and puts it on a server of static files.
 - `tests/`: the Vitest tests. `tests/test_states.ts` makes small states and small runs, and `tests/test_git_repository.ts` makes a small real Git repository. Only the tests import them.
 - Command to write the commits of this repository: `pnpm commits`. Add `--git-folder <path>` for another repository.
-- Command to play: `pnpm dev` at the root of the repository. Add `?seed=42` to the address of the page to play the same world again.
-- Command to build the static folder `dist`: `pnpm --filter git_runner build`
-- Command to publish the game on GitHub Pages: `pnpm --filter git_runner deploy:ghpages`. The command writes `public/commits.json`, builds `dist`, and pushes `dist` to the branch `gh-pages` with the npm package `gh-pages`.
+- Command to play: `pnpm --filter git_runner dev`. Add `?seed=42` to the address of the page to play the same world again.
+- Command to build the static folder `dist`: `pnpm --filter git_runner build`. The package `packages/website` copies this folder to the path `/2d/` of the website, and publishes the website on GitHub Pages.
 - Command to test this folder: `pnpm --filter git_runner test`
 - Command to check the types: `pnpm --filter git_runner exec tsc --noEmit`
 
