@@ -14,6 +14,7 @@ The game Git Runner: a static web page. A dinosaur like the dinosaur of Chrome D
 - Command to write the commits of this repository: `pnpm commits`. Add `--git-folder <path>` for another repository.
 - Command to play: `pnpm dev` at the root of the repository. Add `?seed=42` to the address of the page to play the same world again.
 - Command to build the static folder `dist`: `pnpm --filter git_runner build`
+- Command to publish the game on GitHub Pages: `pnpm --filter git_runner deploy:ghpages`. The command writes `public/commits.json`, builds `dist`, and pushes `dist` to the branch `gh-pages` with the npm package `gh-pages`.
 - Command to test this folder: `pnpm --filter git_runner test`
 - Command to check the types: `pnpm --filter git_runner exec tsc --noEmit`
 
@@ -28,8 +29,8 @@ The game Git Runner: a static web page. A dinosaur like the dinosaur of Chrome D
 - Every number that sets the feel of the game is in `GameSettings`, and no other file of `src/game/` holds one.
 - The code draws every picture and makes every sound. The package has no image file and no sound file.
 - The tests test `src/game/`, `src/commit_export/`, the build, and the shape of the pixel pictures of `src/view/sprite_frames.ts`. They do not test the drawing.
-
 - `tests/agents_rules_size.test.ts` also tests that no file of the folder `docs/agents_rules` of the repository is larger than the maximum size that the file `AGENTS.md` gives.
+
 ## Background
 - The package comes from [issue #536](https://github.com/heidrun-org/heidrun/issues/536), the first stage of the full game of [issue #537](https://github.com/heidrun-org/heidrun/issues/537).
 - The plan of stage 1 is [issue #538](https://github.com/heidrun-org/heidrun/issues/538), and the plan of stage 2 is [issue #540](https://github.com/heidrun-org/heidrun/issues/540).

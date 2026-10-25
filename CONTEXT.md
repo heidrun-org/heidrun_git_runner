@@ -11,6 +11,7 @@ The pnpm monorepo of the game Git Runner: a static web page where a dinosaur run
 - Command to play: `pnpm dev`
 - Command to write the commits of a repository: `pnpm commits --git-folder <absolute path>`
 - Command to build the static folder: `pnpm build`
+- Command to publish the game on GitHub Pages: `pnpm deploy:ghpages`
 - Command to run the tests: `pnpm test`
 - Command to check the types: `pnpm typecheck`
 

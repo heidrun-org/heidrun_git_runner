@@ -31,6 +31,8 @@ Add `?seed=42` to the address of the page to play the same world again.
 2. Build the static folder: `pnpm build`
 3. Copy the folder `packages/git_runner/dist` to your server, or to the branch of your GitHub Pages.
 
+To publish this repository on GitHub Pages, run `pnpm deploy:ghpages`. The command writes the file of commits of this repository, builds the folder `dist`, and pushes the folder `dist` to the branch `gh-pages` with the npm package `gh-pages`. The game is at https://heidrun-org.github.io/heidrun_git_runner/.
+
 The folder `dist` holds `index.html`, one script, and `commits.json`. Every address is relative, so the folder works in any place. A browser blocks a page that you open as a file, so use a server of static files, or the command `pnpm --filter git_runner exec vite preview`.
 
 ## Keys

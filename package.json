@@ -8,6 +8,7 @@
     "build": "pnpm --filter git_runner build",
     "commits": "pnpm --filter git_runner commits:build",
     "test": "pnpm --filter git_runner test",
-    "typecheck": "pnpm --filter git_runner exec tsc --noEmit"
+    "typecheck": "pnpm --filter git_runner exec tsc --noEmit",
+    "deploy:ghpages": "pnpm --filter git_runner deploy:ghpages"
   }
 }
