@@ -45,6 +45,14 @@ export class SoundPlayer {
 	}
 
 	/**
+	 * Tells whether the sound is off.
+	 * @returns True when the sound is off.
+	 */
+	get isMuted(): boolean {
+		return this._isMuted;
+	}
+
+	/**
 	 * Turns the sound on when it is off, and off when it is on. A short note tells the player that the sound is on.
 	 * @returns True when the sound is off now.
 	 */

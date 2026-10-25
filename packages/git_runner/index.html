@@ -18,10 +18,35 @@
 				width: 100%;
 				height: 100%;
 			}
+			/* The speaker button at the bottom left turns the sound on and off. */
+			#sound-button {
+				position: fixed;
+				left: 16px;
+				bottom: 16px;
+				width: 44px;
+				height: 44px;
+				padding: 0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				border: none;
+				border-radius: 50%;
+				background: rgba(0, 0, 0, 0.35);
+				color: #ffffff;
+				cursor: pointer;
+			}
+			#sound-button svg {
+				width: 24px;
+				height: 24px;
+			}
+			#sound-button:hover {
+				background: rgba(0, 0, 0, 0.55);
+			}
 		</style>
 	</head>
 	<body>
 		<canvas id="game"></canvas>
+		<button id="sound-button" type="button" aria-label="Sound"></button>
 		<script type="module" src="/src/view/game_page.ts"></script>
 	</body>
 </html>

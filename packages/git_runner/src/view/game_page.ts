@@ -3,6 +3,7 @@ import { CommitLoader } from './commit_loader.ts';
 import type { LoadedCommits } from './commit_loader.ts';
 import { KeyboardInput } from './keyboard_input.ts';
 import { SceneRenderer } from './scene_renderer.ts';
+import { SoundButton } from './sound_button.ts';
 import { SoundPlayer } from './sound_player.ts';
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -100,10 +101,14 @@ export class GamePage {
 	 * Connects the keyboard and the window, then asks for the first frame.
 	 */
 	private _run(): void {
+		const soundButton = SoundButton.attach(() => {
+			this._soundPlayer.resume();
+			return this._soundPlayer.toggleMuted();
+		}, this._soundPlayer.isMuted);
 		KeyboardInput.attach(window, (action) => {
 			this._soundPlayer.resume();
 			if (action === 'toggleSound') {
-				this._soundPlayer.toggleMuted();
+				soundButton.show(this._soundPlayer.toggleMuted());
 				return;
 			}
 			this._gameWorld.command(action);
