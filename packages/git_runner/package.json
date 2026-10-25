@@ -11,13 +11,11 @@
     "dev": "vite --open",
     "build": "vite build",
     "commits:build": "tsx src/commit_export/cli.ts",
-    "test": "vitest run --minWorkers=1 --maxWorkers=4",
-    "deploy:ghpages": "pnpm commits:build && pnpm build && gh-pages --dist dist"
+    "test": "vitest run --minWorkers=1 --maxWorkers=4"
   },
   "devDependencies": {
     "@types/node": "^26.6.5",
     "commander": "^15.0.0",
-    "gh-pages": "^6.3.0",
     "tsx": "^4.23.15",
     "typescript": "^5.6.0",
     "vite": "^5.4.0",
