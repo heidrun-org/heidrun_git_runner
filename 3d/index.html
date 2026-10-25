@@ -3,8 +3,21 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>Goat 3D</title>
+		<title>Heidrun 3D</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Luckiest+Guy&display=swap" rel="stylesheet" />
 		<style>
+			:root {
+				--ink: #1b1b1b;
+				--paper: #fffaf0;
+				--sun: #ffd23f;
+				--sky: #4cc9f0;
+				--berry: #ef476f;
+				--title-font: 'Luckiest Guy', 'Arial Black', system-ui, sans-serif;
+				--text-font: 'Fredoka', system-ui, sans-serif;
+			}
+
 			/* The 3D canvas fills the window. */
 			html,
 			body {
@@ -16,9 +29,308 @@
 			canvas {
 				display: block;
 			}
+
+			/* The start screen covers the 3D scene, where the camera turns around the goat. */
+			#start-screen {
+				position: fixed;
+				inset: 0;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				gap: clamp(12px, 3vh, 28px);
+				padding: 16px;
+				box-sizing: border-box;
+				text-align: center;
+				cursor: pointer;
+				/* Comic dots over a soft dark edge, so that the goat in the middle stays visible. */
+				background:
+					radial-gradient(circle, rgba(27, 27, 27, 0.18) 1.5px, transparent 1.6px) 0 0 / 14px 14px,
+					radial-gradient(ellipse at center, transparent 35%, rgba(20, 24, 40, 0.65) 100%);
+				transition: opacity 0.5s ease, visibility 0.5s;
+			}
+			#start-screen.is-hidden {
+				opacity: 0;
+				visibility: hidden;
+			}
+			.start-title {
+				margin: 0;
+				font-family: var(--title-font);
+				font-size: clamp(56px, 13vw, 160px);
+				line-height: 0.9;
+				letter-spacing: 0.02em;
+				color: var(--sun);
+				-webkit-text-stroke: clamp(2px, 0.5vw, 5px) var(--ink);
+				text-shadow: 0.06em 0.06em 0 var(--ink);
+				transform: rotate(-4deg);
+			}
+			.start-title span {
+				color: var(--sky);
+			}
+			.start-tagline {
+				margin: 0;
+				padding: 6px 18px;
+				font-family: var(--text-font);
+				font-weight: 700;
+				font-size: clamp(16px, 2.6vw, 24px);
+				color: var(--ink);
+				background: var(--paper);
+				border: 3px solid var(--ink);
+				border-radius: 999px;
+				box-shadow: 4px 4px 0 var(--ink);
+				transform: rotate(2deg);
+			}
+			.start-press {
+				margin-top: clamp(8px, 4vh, 40px);
+				padding: 12px 28px;
+				font-family: var(--title-font);
+				font-size: clamp(22px, 4vw, 40px);
+				color: var(--paper);
+				background: var(--berry);
+				border: 4px solid var(--ink);
+				border-radius: 18px;
+				box-shadow: 6px 6px 0 var(--ink);
+				animation: bob 1.2s ease-in-out infinite;
+			}
+			.start-hint {
+				margin: 0;
+				font-family: var(--text-font);
+				font-weight: 500;
+				font-size: clamp(14px, 2vw, 18px);
+				color: var(--paper);
+				text-shadow: 2px 2px 0 var(--ink);
+			}
+			@keyframes bob {
+				0%,
+				100% {
+					transform: translateY(0) rotate(-1deg);
+				}
+				50% {
+					transform: translateY(-8px) rotate(1deg);
+				}
+			}
+
+			/* The help window lists every key. The key ? opens and closes the help window. */
+			#help-dialog {
+				position: fixed;
+				inset: 0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				padding: 16px;
+				box-sizing: border-box;
+				background: rgba(20, 24, 40, 0.55);
+				transition: opacity 0.2s ease, visibility 0.2s;
+			}
+			#help-dialog.is-hidden {
+				opacity: 0;
+				visibility: hidden;
+			}
+			.help-card {
+				width: min(440px, 100%);
+				max-height: calc(100vh - 32px);
+				overflow-y: auto;
+				box-sizing: border-box;
+				padding: 24px 24px 20px;
+				font-family: var(--text-font);
+				color: var(--ink);
+				background: var(--paper);
+				border: 4px solid var(--ink);
+				border-radius: 20px;
+				box-shadow: 10px 10px 0 var(--ink);
+				transform: rotate(-1deg);
+			}
+			.help-card h2 {
+				margin: 0 0 16px;
+				font-family: var(--title-font);
+				font-size: 36px;
+				font-weight: 400;
+				color: var(--sun);
+				-webkit-text-stroke: 1.5px var(--ink);
+				text-shadow: 3px 3px 0 var(--ink);
+			}
+			.help-keys {
+				display: grid;
+				grid-template-columns: auto 1fr;
+				gap: 12px 16px;
+				align-items: center;
+				margin: 0;
+			}
+			.help-keys dt {
+				display: flex;
+				gap: 6px;
+				justify-content: flex-end;
+			}
+			.help-keys dd {
+				margin: 0;
+				font-weight: 500;
+				font-size: 18px;
+			}
+			kbd {
+				display: inline-block;
+				min-width: 1.6em;
+				padding: 4px 10px 2px;
+				font-family: var(--title-font);
+				font-size: 18px;
+				line-height: 1.2;
+				text-align: center;
+				color: var(--ink);
+				background: var(--sun);
+				border: 3px solid var(--ink);
+				border-bottom-width: 6px;
+				border-radius: 10px;
+			}
+			.help-close {
+				margin: 20px 0 0;
+				font-size: 14px;
+				text-align: center;
+				opacity: 0.7;
+			}
+
+			/* The round buttons at the top right turn the sound and the music on and off. They stay over the start
+			   screen. */
+			.corner-button {
+				position: fixed;
+				top: 16px;
+				right: 16px;
+				z-index: 10;
+				width: 52px;
+				height: 52px;
+				padding: 0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				color: var(--ink);
+				background: var(--sun);
+				border: 4px solid var(--ink);
+				border-radius: 50%;
+				box-shadow: 4px 4px 0 var(--ink);
+				cursor: pointer;
+				transition: transform 0.1s ease, box-shadow 0.1s ease;
+			}
+			#music-button {
+				right: 80px;
+			}
+			.corner-button svg {
+				width: 26px;
+				height: 26px;
+			}
+			.corner-button:hover {
+				transform: translate(-1px, -1px) rotate(-6deg);
+				box-shadow: 5px 5px 0 var(--ink);
+			}
+			.corner-button:active {
+				transform: translate(3px, 3px);
+				box-shadow: 1px 1px 0 var(--ink);
+			}
+			.corner-button[aria-pressed='false'] {
+				background: var(--paper);
+			}
+
+			/* The Tweakpane panel sits under the round buttons. */
+			#tuning-pane-container {
+				position: fixed;
+				top: 84px;
+				right: 16px;
+				z-index: 5;
+				width: 256px;
+			}
+
+			/* A comic word, like "POW!", that shows a sound of the goat. */
+			.comic-burst {
+				position: fixed;
+				z-index: 4;
+				pointer-events: none;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				transform: translate(-50%, -50%);
+				animation: burst-pop 0.9s ease-out forwards;
+			}
+			.comic-burst svg {
+				position: absolute;
+				inset: 0;
+				width: 100%;
+				height: 100%;
+				filter: drop-shadow(4px 4px 0 rgba(27, 27, 27, 0.35));
+			}
+			.comic-burst span {
+				position: relative;
+				font-family: var(--title-font);
+				color: var(--sun);
+				-webkit-text-stroke: 0.06em var(--ink);
+				text-shadow: 0.06em 0.06em 0 var(--ink);
+				transform: rotate(-6deg);
+				white-space: nowrap;
+			}
+			.comic-burst span.comic-burst-dark-word {
+				color: #e63946;
+				text-shadow: 0.05em 0.05em 0 var(--sun);
+			}
+						@keyframes burst-pop {
+				0% {
+					opacity: 1;
+					transform: translate(-50%, -50%) scale(0.2) rotate(calc(var(--tilt) - 20deg));
+				}
+				15% {
+					transform: translate(-50%, -50%) scale(1.15) rotate(var(--tilt));
+				}
+				25% {
+					transform: translate(-50%, -50%) scale(1) rotate(var(--tilt));
+				}
+				70% {
+					opacity: 1;
+				}
+				100% {
+					opacity: 0;
+					transform: translate(-50%, -70%) scale(1.08) rotate(var(--tilt));
+				}
+			}
+
+			@media (prefers-reduced-motion: reduce) {
+				.start-press {
+					animation: none;
+				}
+			}
 		</style>
-		<script type="module" crossorigin src="./assets/index-PSFrrbl3.js"></script>
+		<script type="module" crossorigin src="./assets/index-C77BfPaB.js"></script>
 	</head>
 	<body>
+		<button id="music-button" class="corner-button" type="button" aria-label="Music"></button>
+		<button id="sound-button" class="corner-button" type="button" aria-label="Sound"></button>
+		<div id="tuning-pane-container"></div>
+
+		<div id="start-screen">
+			<h1 class="start-title">Heidrun <span>3D</span></h1>
+			<p class="start-tagline">Climb the mountain. Reach the flag!</p>
+			<div class="start-press">Press any key to play</div>
+			<p class="start-hint">Press <kbd>?</kbd> for the keys</p>
+		</div>
+
+		<div id="help-dialog" class="is-hidden" role="dialog" aria-modal="true" aria-labelledby="help-title">
+			<div class="help-card">
+				<h2 id="help-title">The keys</h2>
+				<dl class="help-keys">
+					<dt><kbd>↑</kbd></dt>
+					<dd>Walk forward</dd>
+					<dt><kbd>↓</kbd></dt>
+					<dd>Walk backward</dd>
+					<dt><kbd>←</kbd><kbd>→</kbd></dt>
+					<dd>Turn left and right</dd>
+					<dt><kbd>Shift</kbd></dt>
+					<dd>Run, with an arrow key</dd>
+					<dt><kbd>Space</kbd></dt>
+					<dd>Jump. Run and jump to go far!</dd>
+					<dt><kbd>M</kbd></dt>
+					<dd>Turn the sound on and off</dd>
+					<dt><kbd>?</kbd></dt>
+					<dd>Show or hide these keys</dd>
+					<dt><kbd>Esc</kbd></dt>
+					<dd>Hide these keys</dd>
+				</dl>
+				<p class="help-close">Press <kbd>?</kbd> or <kbd>Esc</kbd>, or click, to close</p>
+			</div>
+		</div>
+
 	</body>
 </html>

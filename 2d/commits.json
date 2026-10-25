@@ -13,7 +13,8 @@
 {"hash":"101f70b443ceb64fb455bbc360b94ad7d4e3d06e","committedAt":"2026-10-25T19:16:30.000Z","subject":"Add the command deploy:ghpages that publishes the game on GitHub Pages with the npm package gh-pages","insertions":373,"deletions":3,"isMerge":false,"lane":1},
 {"hash":"babb87cec84697194e8831c2f1d6227055cf4f4d","committedAt":"2026-10-25T20:18:09.000Z","subject":"Add the package goat_3d, a 3D game where a low poly goat climbs a mountain","insertions":1430,"deletions":0,"isMerge":false,"lane":1},
 {"hash":"ef3b861a283c8ecaad31e70ab48534dd0b9628b9","committedAt":"2026-10-25T20:18:45.000Z","subject":"Add the package website with a homepage, Git Runner at /2d/, and Goat 3D at /3d/, fixes #3","insertions":1480,"deletions":20,"isMerge":false,"lane":0},
-{"hash":"66738e6e8f7d95f83f64ee19fdc727f79112ce0b","committedAt":"2026-10-25T20:18:58.000Z","subject":"Merge pull request #4 from heidrun-org/website-package-3","insertions":1480,"deletions":20,"isMerge":true,"lane":2},
+{"hash":"66738e6e8f7d95f83f64ee19fdc727f79112ce0b","committedAt":"2026-10-25T20:18:58.000Z","subject":"Merge pull request #4 from heidrun-org/website-package-3","insertions":1480,"deletions":20,"isMerge":true,"lane":0},
 {"hash":"7c08ec8bf96fc6198837966108c9d3f43f9aa9c5","committedAt":"2026-10-25T20:28:18.000Z","subject":"Add leaves to the gothic trees, the cartoon look of webgl_materials_toon, and a Tweakpane panel to tune it","insertions":406,"deletions":50,"isMerge":false,"lane":1},
-{"hash":"0af5e42db4bc3ccba134af29eb6cba75e9af11c6","committedAt":"2026-10-25T20:29:48.000Z","subject":"Merge remote-tracking branch 'origin/main'","insertions":257,"deletions":20,"isMerge":true,"lane":1}
+{"hash":"0af5e42db4bc3ccba134af29eb6cba75e9af11c6","committedAt":"2026-10-25T20:29:48.000Z","subject":"Merge remote-tracking branch 'origin/main'","insertions":257,"deletions":20,"isMerge":true,"lane":1},
+{"hash":"d90b249a1013856b75a5afa8d10ea4e413ac6a0f","committedAt":"2026-10-25T20:30:33.000Z","subject":"Updates","insertions":4084,"deletions":78,"isMerge":false,"lane":2}
 ]}
