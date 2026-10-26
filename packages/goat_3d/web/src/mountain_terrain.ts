@@ -13,7 +13,7 @@ import { ToonStyle } from './toon_style.ts';
  */
 export class MountainTerrain {
 	/**
-	 * The length of a side of the square ground, in units.
+	 * The length of a side of the square ground, in meters.
 	 */
 	static readonly SIZE = 60;
 
@@ -23,12 +23,12 @@ export class MountainTerrain {
 	static readonly SEGMENT_COUNT = 90;
 
 	/**
-	 * The height of the top of the mountain, before the bumps, in units.
+	 * The height of the top of the mountain, before the bumps, in meters.
 	 */
 	static readonly PEAK_HEIGHT = 10;
 
 	/**
-	 * How wide the mountain is, in units. A larger number gives a wider mountain with gentler slopes.
+	 * How wide the mountain is, in meters. A larger number gives a wider mountain with gentler slopes.
 	 */
 	static readonly SPREAD = 7;
 
@@ -47,7 +47,7 @@ export class MountainTerrain {
 	 * Gives the height of the ground at a point.
 	 * @param x the position on the x axis.
 	 * @param z the position on the z axis.
-	 * @returns the height of the ground, in units.
+	 * @returns the height of the ground, in meters.
 	 */
 	static heightAt(x: number, z: number): number {
 		// The mountain is a little longer on the x axis than on the z axis.

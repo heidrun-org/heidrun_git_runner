@@ -1,4 +1,5 @@
 import * as Three from 'three';
+import type { CSM } from 'three/addons/csm/CSM.js';
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -77,6 +78,16 @@ export class ToonStyle {
 				thickness: thickness,
 				color: color.toArray(),
 			};
+		}
+	}
+
+	/**
+	 * Gives the cascaded shadow maps of the sun to every material that this class made.
+	 * @param csm the cascaded shadow maps of the sun.
+	 */
+	static setupCascadedShadows(csm: CSM): void {
+		for (const material of ToonStyle._materials) {
+			csm.setupMaterial(material);
 		}
 	}
 

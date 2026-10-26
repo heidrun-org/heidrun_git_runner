@@ -1,7 +1,7 @@
 # Directory Context: `/packages/website`
 
 ## Purpose
-The website that hosts the two games: a homepage at `/`, the game Git Runner of `packages/git_runner` at `/2d/`, and the game Goat 3D of `packages/goat_3d` at `/3d/`.
+The website that hosts the two games: a homepage at `/`, the game Git Runner of `packages/git_runner` at `/2d/`, and the game Heidrun 3D of `packages/goat_3d` at `/3d/`.
 
 ## Key Exports & Entry Points
 - `web/index.html`: the homepage, with a link to each game.

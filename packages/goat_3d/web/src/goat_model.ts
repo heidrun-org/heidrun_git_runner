@@ -9,6 +9,21 @@ import { ToonStyle } from './toon_style.ts';
 ///////////////////////////////////////////////////////////////////////////////
 
 /**
+ * The place and the lift of a hoof at one moment of a step.
+ */
+type LegStep = {
+	/**
+	 * The place of the hoof, from 1 in front of the hip to -1 behind the hip.
+	 */
+	hoofPosition: number;
+
+	/**
+	 * The lift of the hoof, from 0 on the ground to 1 at the highest point.
+	 */
+	lift: number;
+};
+
+/**
  * The groups of the legs of the goat, in this order: back left, back right, front left, front right.
  */
 type GoatLegs = {
@@ -32,6 +47,28 @@ export class GoatModel {
 	 * point when the goat leans forward or backward.
 	 */
 	static readonly BODY_CENTER_Y = 0.95;
+
+	/**
+	 * The scale of the whole goat. The parts are built for a goat about 1.3 units high at the shoulders, and this
+	 * scale makes the goat about 0.75 meters high at the shoulders and about 1 meter high at the top of the head,
+	 * like a real goat. One unit is one meter.
+	 */
+	static readonly SCALE = 0.58;
+
+	/**
+	 * The height of the hips above the ground, before `SCALE`. It is also the length of a straight leg.
+	 */
+	static readonly HIP_HEIGHT = 0.9;
+
+	/**
+	 * The length of a straight leg, from the hip to the ground, in meters.
+	 */
+	static readonly LEG_LENGTH = GoatModel.HIP_HEIGHT * GoatModel.SCALE;
+
+	/**
+	 * How much a knee bends to lift the hoof while the leg swings forward, as a ratio of the swing angle.
+	 */
+	static readonly KNEE_LIFT_RATIO = 1.4;
 
 	/**
 	 * The group that holds every part of the goat. Move and turn this group to move and turn the goat.
@@ -92,6 +129,7 @@ export class GoatModel {
 			object.castShadow = true;
 		});
 
+		goat.scale.setScalar(GoatModel.SCALE);
 		this.group = goat;
 		this._bodyCenter = bodyCenter;
 		this._hips = legs.hips;
@@ -99,9 +137,22 @@ export class GoatModel {
 	}
 
 	/**
-	 * Puts the goat in a pose, and adds the swing of the legs of the walk on top of the pose. The back left leg
-	 * and the front right leg swing together, and the two other legs swing the opposite way, like the walk of a
-	 * real goat.
+	 * Gives the number of radians of the walk phase per meter of walk, so that a hoof on the ground does not
+	 * slide. In the first half of a step, the hoof is on the ground and goes back at a steady speed, from
+	 * `LEG_LENGTH * sin(swingAngle)` in front of the hip to the same distance behind the hip: this half step is
+	 * PI radians of the walk phase for `2 * LEG_LENGTH * sin(swingAngle)` meters of walk.
+	 * @param swingAngle the largest angle of a swing of the walk, in radians.
+	 * @returns the radians of the walk phase per meter of walk.
+	 */
+	static stepAnglePerMeter(swingAngle: number): number {
+		return Math.PI / (2 * GoatModel.LEG_LENGTH * Math.sin(swingAngle));
+	}
+
+	/**
+	 * Puts the goat in a pose, and adds the steps of the walk on top of the pose. The back left leg and the front
+	 * right leg step together, and the two other legs step half a step later, like the walk of a real goat. In
+	 * the first half of its step, a hoof is on the ground and goes back at a steady speed. In the second half, the
+	 * knee bends to lift the hoof, and the leg swings forward.
 	 * @param goatPose the pose of the body and of the legs.
 	 * @param walkPhase the angle of the step, in radians. One step is 2 * PI.
 	 * @param swingAngle the largest angle of a swing of the walk, in radians. 0 stops the swing.
@@ -110,15 +161,52 @@ export class GoatModel {
 		this._bodyCenter.position.y = GoatModel.BODY_CENTER_Y - goatPose.crouch;
 		this._bodyCenter.rotation.z = goatPose.pitch;
 
-		const swingSigns = [1, -1, -1, 1];
+		const phaseOffsets = [0, Math.PI, Math.PI, 0];
 		for (let index = 0; index < this._hips.length; index++) {
 			// The first two legs are the back legs.
 			const isBackLeg = index < 2;
 			const hipAngle = isBackLeg === true ? goatPose.backHip : goatPose.frontHip;
 			const kneeAngle = isBackLeg === true ? goatPose.backKnee : goatPose.frontKnee;
-			this._hips[index].rotation.z = hipAngle + swingSigns[index] * Math.sin(walkPhase) * swingAngle;
-			this._knees[index].rotation.z = kneeAngle;
+			const legStep = GoatModel._legStep(walkPhase + phaseOffsets[index]);
+			// The hoof moves in a straight line under the hip, so the angle of the leg is the arc sine.
+			const swingHipAngle = Math.asin(legStep.hoofPosition * Math.sin(swingAngle));
+			// A front knee bends the hoof backward, and a back knee, the hock, bends the hoof forward.
+			const kneeSign = isBackLeg === true ? 1 : -1;
+			const liftKneeAngle = kneeSign * legStep.lift * swingAngle * GoatModel.KNEE_LIFT_RATIO;
+			this._hips[index].rotation.z = hipAngle + swingHipAngle;
+			this._knees[index].rotation.z = kneeAngle + liftKneeAngle;
 		}
+	}
+
+	///////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////
+	//	Steps
+	///////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Gives the place of a hoof and the lift of the hoof at one moment of a step.
+	 * @param legPhase the angle of the step of this leg, in radians. One step is 2 * PI.
+	 * @returns the place of the hoof, from 1 in front of the hip to -1 behind the hip, and the lift of the hoof,
+	 * from 0 on the ground to 1 at the highest point.
+	 */
+	private static _legStep(legPhase: number): LegStep {
+		const twoPi = 2 * Math.PI;
+		const phase = ((legPhase % twoPi) + twoPi) % twoPi;
+		if (phase < Math.PI) {
+			// The hoof is on the ground, and goes back at a steady speed.
+			return {
+				hoofPosition: 1 - 2 * phase / Math.PI,
+				lift: 0,
+			};
+		}
+		// The hoof is in the air, and swings forward, slowly at the start and at the end.
+		const ratio = (phase - Math.PI) / Math.PI;
+		const smoothRatio = ratio * ratio * (3 - 2 * ratio);
+		return {
+			hoofPosition: -1 + 2 * smoothRatio,
+			lift: Math.sin(Math.PI * ratio),
+		};
 	}
 
 	///////////////////////////////////////////////////////////////////////////////
@@ -147,7 +235,7 @@ export class GoatModel {
 		};
 		const kneeGeometry = new Three.SphereGeometry(0.065, 8, 6);
 		const hoofGeometry = new Three.CylinderGeometry(0.055, 0.07, 0.08, 8);
-		const hipY = 0.9;
+		const hipY = GoatModel.HIP_HEIGHT;
 		const kneeY = 0.42;
 		for (const legX of [-0.42, 0.42]) {
 			// The back legs bend backward at the hock, and the front legs stand straight.

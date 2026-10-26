@@ -10,7 +10,8 @@
  */
 export type GoatPose = {
 	/**
-	 * How far the body goes down, in units. 0 is the body of a goat that stands.
+	 * How far the body goes down, in units of the goat model before `GoatModel.SCALE`. 0 is the body of a goat
+	 * that stands.
 	 */
 	crouch: number;
 
@@ -56,12 +57,12 @@ type GoatJumpState = 'standing' | 'crouching' | 'flying' | 'landing';
  */
 export class GoatJump {
 	/**
-	 * The upward speed of the goat when the goat leaves the ground, in units per second.
+	 * The upward speed of the goat when the goat leaves the ground, in meters per second.
 	 */
-	static readonly JUMP_SPEED = 4.5;
+	static readonly JUMP_SPEED = 6;
 
 	/**
-	 * The gravity that pulls the goat back to the ground, in units per second per second.
+	 * The gravity that pulls the goat back to the ground, in meters per second per second.
 	 */
 	static readonly GRAVITY = 12;
 
@@ -148,7 +149,7 @@ export class GoatJump {
 	};
 
 	/**
-	 * The height of the feet of the goat, in units. While the goat is not in the air, it is the height of the
+	 * The height of the feet of the goat, in meters. While the goat is not in the air, it is the height of the
 	 * ground under the goat.
 	 */
 	positionY = 0;
@@ -161,7 +162,7 @@ export class GoatJump {
 	};
 
 	/**
-	 * The upward speed of the goat, in units per second. A negative speed moves the goat down.
+	 * The upward speed of the goat, in meters per second. A negative speed moves the goat down.
 	 */
 	private _verticalSpeed = 0;
 
@@ -181,6 +182,25 @@ export class GoatJump {
 	private _wasJumpPressed = false;
 
 	/**
+	 * The highest height of the feet of the goat during the current jump, in meters.
+	 */
+	private _highestY = 0;
+
+	/**
+	 * The height of the last fall, from the highest point of the jump down to the ground where the goat landed,
+	 * in meters. A jump on flat ground gives about 1.5 meters, and a jump down a slope gives more.
+	 */
+	lastFallHeight = 0;
+
+	/**
+	 * Tells if the goat is in the air.
+	 * @returns true when the goat is in the air.
+	 */
+	isFlying(): boolean {
+		return this._state === 'flying';
+	}
+
+	/**
 	 * Tells if the goat stands on the ground, so that it can walk with its legs.
 	 * @returns true when the goat stands on the ground.
 	 */
@@ -193,7 +213,7 @@ export class GoatJump {
 	 * not while the player holds the jump key down.
 	 * @param deltaSeconds the time since the previous update, in seconds.
 	 * @param isJumpPressed true when the player holds down the jump key.
-	 * @param groundY the height of the ground under the goat, in units.
+	 * @param groundY the height of the ground under the goat, in meters.
 	 */
 	update(deltaSeconds: number, isJumpPressed: boolean, groundY: number): void {
 		const isJumpStarted = isJumpPressed === true && this._wasJumpPressed === false;
@@ -205,15 +225,18 @@ export class GoatJump {
 		}
 		if (this._state === 'crouching' && this._stateSeconds >= GoatJump.CROUCH_SECONDS) {
 			this._verticalSpeed = GoatJump.JUMP_SPEED;
+			this._highestY = this.positionY;
 			this._changeState('flying');
 		}
 		if (this._state === 'flying') {
 			this._verticalSpeed -= GoatJump.GRAVITY * deltaSeconds;
 			this.positionY += this._verticalSpeed * deltaSeconds;
+			this._highestY = Math.max(this._highestY, this.positionY);
 			// The goat lands only while it comes down, so that a jump up a slope does not stop at once.
 			// While the goat goes up, the ground only pushes the goat up.
 			if (this.positionY <= groundY && this._verticalSpeed < 0) {
 				this._verticalSpeed = 0;
+				this.lastFallHeight = this._highestY - groundY;
 				this._changeState('landing');
 			} else if (this.positionY < groundY) {
 				this.positionY = groundY;

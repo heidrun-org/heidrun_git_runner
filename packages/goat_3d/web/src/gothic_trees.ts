@@ -52,12 +52,12 @@ export class GothicTrees {
 	static readonly MAXIMUM_GROUND_HEIGHT = 4;
 
 	/**
-	 * A tree grows only where the slope is gentler than this slope, in units up per unit across.
+	 * A tree grows only where the slope is gentler than this slope, in meters up per meter across.
 	 */
 	static readonly MAXIMUM_SLOPE = 0.7;
 
 	/**
-	 * No tree grows nearer than this distance to the start point of the goat, in units.
+	 * No tree grows nearer than this distance to the start point of the goat, in meters.
 	 */
 	static readonly START_CLEARANCE = 4;
 
@@ -164,8 +164,8 @@ export class GothicTrees {
 	 * @param randomFn the function that gives the next random number, from 0 to 1.
 	 * @param start the point where the branch starts.
 	 * @param direction the direction of the branch, as a unit vector.
-	 * @param length the length of the branch, in units.
-	 * @param radius the radius of the branch at its start, in units.
+	 * @param length the length of the branch, in meters.
+	 * @param radius the radius of the branch at its start, in meters.
 	 * @param depth the number of splits from the trunk to this branch. The trunk has a depth of 0.
 	 */
 	private static _addBranch(

@@ -13,7 +13,7 @@ const __dirname = import.meta.dirname;
 
 /**
  * A Vite plugin that copies the folder `dist` of each game into the folder `dist` of the website, after the build
- * of the homepage. The folder `dist/2d` holds the game Git Runner, and the folder `dist/3d` holds the game Goat 3D.
+ * of the homepage. The folder `dist/2d` holds the game Git Runner, and the folder `dist/3d` holds the game Heidrun 3D.
  */
 class GameFoldersPlugin {
 	/**
